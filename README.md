@@ -1,5 +1,5 @@
 # Ex.No: 07                                       AUTO REGRESSIVE MODEL
-### Date: 
+### Date: 01-05-25
 
 
 
@@ -14,16 +14,92 @@ To Implementat an Auto Regressive Model using Python
 6. Make predictions using the AR model.Compare the predictions with the test data
 7. Calculate Mean Squared Error (MSE).Plot the test data and predictions.
 ### PROGRAM
+```
+DEVELOPED BY: KUKKADAPU CHARAN TEJ
+REGISTER NUMBER: 212224040167
+```
+```py
+# Step 1: Import necessary libraries
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from statsmodels.tsa.stattools import adfuller
+from statsmodels.tsa.ar_model import AutoReg
+from statsmodels.graphics.tsaplots import plot_pacf, plot_acf
+from sklearn.metrics import mean_squared_error
+import warnings
+warnings.filterwarnings('ignore')
+
+# Step 2: Read the CSV file into a DataFrame
+data = pd.read_csv('Gold Price Prediction.csv')
+
+# Convert 'Date' column to datetime
+data['Date'] = pd.to_datetime(data['Date'])
+
+# Assuming 'Price Today' is the column of interest for gold price
+gold_prices = data[['Date', 'Price Today']]
+
+# Set 'Date' as the index
+gold_prices.set_index('Date', inplace=True)
+
+# Step 3: Perform Augmented Dickey-Fuller test for stationarity
+result = adfuller(gold_prices['Price Today'].dropna())
+print('ADF Statistic:', result[0])
+print('p-value:', result[1])
+
+# Step 4: Split the data into training and testing sets (80-20 split)
+train_size = int(len(gold_prices) * 0.8)
+train_data, test_data = gold_prices[0:train_size], gold_prices[train_size:]
+
+# Step 5: Fit an AutoRegressive (AR) model with 13 lags
+model = AutoReg(train_data['Price Today'], lags=13)
+ar_model_fit = model.fit()
+
+# Step 6: Plot Partial Autocorrelation Function (PACF) and Autocorrelation Function (ACF)
+plt.figure(figsize=(10, 5))
+plot_acf(train_data['Price Today'], lags=40)
+plt.title('Autocorrelation Function (ACF)')
+plt.show()
+
+plt.figure(figsize=(10, 5))
+plot_pacf(train_data['Price Today'], lags=40)
+plt.title('Partial Autocorrelation Function (PACF)')
+plt.show()
+
+# Step 7: Make predictions using the AR model
+predictions = ar_model_fit.predict(start=len(train_data), end=len(train_data) + len(test_data) - 1, dynamic=False)
+
+# Step 8: Compare the predictions with the test data
+plt.figure(figsize=(12, 6))
+plt.plot(test_data.index, test_data, label='Actual Test Data', color='blue')
+plt.plot(test_data.index, predictions, label='Predictions', color='red', linestyle='dashed')
+plt.title('Actual vs Predicted Gold Prices')
+plt.xlabel('Date')
+plt.ylabel('Price Today')
+plt.legend()
+plt.grid(True)
+plt.show()
+
+# Step 9: Calculate Mean Squared Error (MSE)
+mse = mean_squared_error(test_data, predictions)
+print('Mean Squared Error (MSE):', mse)
+```
 ### OUTPUT:
 
-GIVEN DATA
+### GIVEN DATA
+![7 1 ts](https://github.com/user-attachments/assets/6f75ece3-5b77-404b-be64-19b24d5e3865)
 
-PACF - ACF
+### PACF - ACF
+![7 2 ts](https://github.com/user-attachments/assets/92964389-2a21-4e4a-9d91-eee94307eadd)
+
+![7 3 ts](https://github.com/user-attachments/assets/f49e84f8-b2d4-4a02-bf25-a38c79146640)
 
 
-PREDICTION
 
-FINIAL PREDICTION
+### PREDICTION
+
+### FINIAL PREDICTION
+![7 4 ts](https://github.com/user-attachments/assets/a9aa7a14-8ff2-43bd-880b-36846ecf5103)
 
 ### RESULT:
 Thus we have successfully implemented the auto regression function using python.
